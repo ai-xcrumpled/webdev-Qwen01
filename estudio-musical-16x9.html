@@ -1,0 +1,1227 @@
+<html lang="pt"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Vídeos Musicais 16:9 Widescreen Studio</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/montserrat@latest/latin-400-normal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/poppins@latest/latin-400-normal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/cinzel@latest/latin-400-normal.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .download-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #00d4ff, #ff00ff);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+        }
+
+        .canvas-container {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #previewCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .controls-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .control-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .control-section h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #00d4ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-group {
+            margin-bottom: 12px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .control-group input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            color: #fff;
+            font-size: 11px;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #00d4ff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .control-group input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #00d4ff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .control-group input[type="text"],
+        .control-group input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .control-group select {
+            width: 100%;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #00d4ff, #ff00ff);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 11px;
+            width: auto;
+            margin-right: 5px;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: #ccc;
+            cursor: pointer;
+        }
+
+        .radio-group input[type="radio"] {
+            width: auto;
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .color-option:hover {
+            border-color: #fff;
+        }
+
+        .color-option.active {
+            border-color: #fff;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .audio-player {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .play-btn {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #00d4ff, #ff00ff);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .time-display {
+            font-size: 12px;
+            color: #aaa;
+            font-family: monospace;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #ff00ff);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .checkbox-group label {
+            font-size: 11px;
+            color: #ccc;
+            margin: 0;
+        }
+
+        .info-text {
+            font-size: 11px;
+            color: #888;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 5px;
+            border-left: 3px solid #00d4ff;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 16:9 STUDIO - Gerador de Vídeos Musicais</h1>
+            <p>Resolução NATIVA: 1920x1080 (1080p) | Glassmorphism Design</p>
+            <button class="download-btn" id="downloadBtn">📥 Descarregar HTML</button>
+        </div>
+
+        <div class="main-layout">
+            <div class="canvas-container">
+                <div class="canvas-wrapper">
+                    <canvas id="previewCanvas" width="1920" height="1080"></canvas>
+                </div>
+                <div class="audio-player">
+                    <div class="audio-controls">
+                        <button class="play-btn" id="playBtn">▶</button>
+                        <div class="progress-bar" id="progressBar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <span class="time-display" id="timeDisplay">00:00 / 00:00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls-panel">
+                <div class="control-section">
+                    <h3>🎵 Ficheiro de Áudio</h3>
+                    <div class="control-group">
+                        <label>Música (.mp3 / .wav)</label>
+                        <input type="file" id="audioFile" accept="audio/*">
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>🖼️ Fundo 16:9 &amp; Layout</h3>
+                    <div class="control-group">
+                        <label>Imagem de Fundo (Wallpaper)</label>
+                        <input type="file" id="bgFile" accept="image/*">
+                    </div>
+                    <div class="control-group">
+                        <label>Inversão de Layout</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="layout" value="left" checked=""> Wallpaper Esq / Conteúdo Dir</label>
+                            <label><input type="radio" name="layout" value="right"> Wallpaper Dir / Conteúdo Esq</label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>Opacidade Fundo: <span id="bgOpacityValue">100</span>%</label>
+                        <input type="range" id="bgOpacity" min="0" max="100" value="100">
+                    </div>
+                    <div class="control-group">
+                        <label>Gradiente Escuro Overlay: <span id="overlayValue">50</span>%</label>
+                        <input type="range" id="overlayOpacity" min="0" max="100" value="50">
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="bgAudioReactive">
+                        <label for="bgAudioReactive">Audio Reativo sobre Fundo</label>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>💿 Capa do Álbum</h3>
+                    <div class="control-group">
+                        <label>Imagem da Capa</label>
+                        <input type="file" id="coverFile" accept="image/*">
+                    </div>
+                    <div class="control-group">
+                        <label>Modo</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="coverMode" value="together" checked=""> Mover Conjunto</label>
+                            <label><input type="radio" name="coverMode" value="pan"> Pan Interno</label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>Zoom da Imagem: <span id="coverZoomValue">100</span>%</label>
+                        <input type="range" id="coverZoom" min="50" max="200" value="100">
+                    </div>
+                    <div class="control-group">
+                        <label>Tamanho da Caixa: <span id="coverSizeValue">300</span>px</label>
+                        <input type="range" id="coverSize" min="150" max="500" value="300">
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="coverLocked">
+                        <label for="coverLocked">🔒 Bloquear Elemento</label>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>📊 Visualizer Reativo</h3>
+                    <div class="control-group">
+                        <label>Modo das Barras</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="vizMode" value="double" checked=""> Duplo (Esq/Dir)</label>
+                            <label><input type="radio" name="vizMode" value="right"> Apenas Direita</label>
+                            <label><input type="radio" name="vizMode" value="left"> Apenas Esquerda</label>
+                            <label><input type="radio" name="vizMode" value="full"> Contorno Completo</label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>Cor do Néon</label>
+                        <div class="color-picker">
+                            <div class="color-option active" data-color="#00d4ff" style="background: #00d4ff;"></div>
+                            <div class="color-option" data-color="#ff00ff" style="background: #ff00ff;"></div>
+                            <div class="color-option" data-color="#8b00ff" style="background: #8b00ff;"></div>
+                            <div class="color-option" data-color="#00ffff" style="background: #00ffff;"></div>
+                            <div class="color-option" data-color="#ffff00" style="background: #ffff00;"></div>
+                            <div class="color-option" data-color="#00ff00" style="background: #00ff00;"></div>
+                            <div class="color-option" data-color="#ffffff" style="background: #ffffff;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>📺 Logotipo Badge Circular</h3>
+                    <div class="control-group">
+                        <label>Logotipo (PNG Transparente)</label>
+                        <input type="file" id="logoFile" accept="image/*">
+                    </div>
+                    <div class="control-group">
+                        <label>Zoom da Imagem: <span id="logoZoomValue">100</span>%</label>
+                        <input type="range" id="logoZoom" min="50" max="200" value="100">
+                    </div>
+                    <div class="control-group">
+                        <label>Tamanho do Badge: <span id="logoSizeValue">100</span>px</label>
+                        <input type="range" id="logoSize" min="50" max="200" value="100">
+                    </div>
+                    <div class="control-group">
+                        <label>Velocidade Rotação: <span id="logoRotationValue">0</span>°/s</label>
+                        <input type="range" id="logoRotation" min="0" max="360" value="0">
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="logoLocked">
+                        <label for="logoLocked">🔒 Bloquear Elemento</label>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>✍️ Tipografia</h3>
+                    <div class="control-group">
+                        <label>Título da Música</label>
+                        <input type="text" id="songTitle" placeholder="Nome da Música">
+                    </div>
+                    <div class="control-group">
+                        <label>Nome do Artista</label>
+                        <input type="text" id="artistName" placeholder="Nome do Artista">
+                    </div>
+                    <div class="control-group">
+                        <label>Fonte</label>
+                        <select id="fontFamily">
+                            <option value="Montserrat">Montserrat</option>
+                            <option value="Poppins">Poppins</option>
+                            <option value="Inter">Inter</option>
+                            <option value="Cinzel">Cinzel</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Preset de Tamanho</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="fontSize" value="32"> Pequeno (32px)</label>
+                            <label><input type="radio" name="fontSize" value="42" checked=""> Médio (42px)</label>
+                            <label><input type="radio" name="fontSize" value="56"> Grande (56px)</label>
+                            <label><input type="radio" name="fontSize" value="72"> Extra (72px)</label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>Tamanho Direto (px)</label>
+                        <input type="number" id="customFontSize" value="42" min="16" max="120">
+                    </div>
+                    <div class="control-group">
+                        <label>Percentagem Artista vs Título: <span id="artistPercentValue">70</span>%</label>
+                        <input type="range" id="artistPercent" min="50" max="90" value="70">
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="textLocked">
+                        <label for="textLocked">🔒 Bloquear Elemento</label>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>🎬 Exportação</h3>
+                    <button class="btn" id="exportBtn">Gerar e Descarregar MP4</button>
+                    <div class="info-text">
+                        💡 Arraste livremente a Capa, o Texto ou o Logotipo no ecrã com linhas guias magnéticas de alinhamento cruzado!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('previewCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Estado da aplicação
+        const state = {
+            audio: null,
+            audioContext: null,
+            analyser: null,
+            audioSource: null,
+            isPlaying: false,
+            audioData: new Uint8Array(256),
+            
+            backgroundImage: null,
+            coverImage: null,
+            logoImage: null,
+            
+            layout: 'left',
+            bgOpacity: 1,
+            overlayOpacity: 0.5,
+            bgAudioReactive: false,
+            
+            coverMode: 'together',
+            coverZoom: 1,
+            coverSize: 300,
+            coverX: 200,
+            coverY: 390,
+            coverPanX: 0,
+            coverPanY: 0,
+            coverLocked: false,
+            
+            vizMode: 'double',
+            vizColor: '#00d4ff',
+            
+            logoZoom: 1,
+            logoSize: 100,
+            logoRotation: 0,
+            logoRotationSpeed: 0,
+            logoX: 1700,
+            logoY: 200,
+            logoLocked: false,
+            
+            songTitle: '',
+            artistName: '',
+            fontFamily: 'Montserrat',
+            fontSize: 42,
+            artistPercent: 0.7,
+            textX: 960,
+            textY: 800,
+            textLocked: false,
+            
+            dragging: null,
+            dragOffsetX: 0,
+            dragOffsetY: 0,
+            
+            snapLines: []
+        };
+
+        // Botão de download
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'estudio-musical-16x9.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        // Inicialização de áudio
+        document.getElementById('audioFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const url = URL.createObjectURL(file);
+            state.audio = new Audio(url);
+            
+            if (!state.audioContext) {
+                state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                state.analyser = state.audioContext.createAnalyser();
+                state.analyser.fftSize = 512;
+                state.audioData = new Uint8Array(state.analyser.frequencyBinCount);
+            }
+            
+            if (state.audioSource) {
+                state.audioSource.disconnect();
+            }
+            
+            state.audioSource = state.audioContext.createMediaElementSource(state.audio);
+            state.audioSource.connect(state.analyser);
+            state.analyser.connect(state.audioContext.destination);
+            
+            state.audio.addEventListener('timeupdate', updateProgress);
+            state.audio.addEventListener('ended', () => {
+                state.isPlaying = false;
+                document.getElementById('playBtn').textContent = '▶';
+            });
+        });
+
+        // Controlo de play/pause
+        document.getElementById('playBtn').addEventListener('click', () => {
+            if (!state.audio) return;
+            
+            if (state.isPlaying) {
+                state.audio.pause();
+                state.isPlaying = false;
+                document.getElementById('playBtn').textContent = '▶';
+            } else {
+                if (state.audioContext.state === 'suspended') {
+                    state.audioContext.resume();
+                }
+                state.audio.play();
+                state.isPlaying = true;
+                document.getElementById('playBtn').textContent = '⏸';
+            }
+        });
+
+        // Progress bar
+        function updateProgress() {
+            const progress = (state.audio.currentTime / state.audio.duration) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            const current = formatTime(state.audio.currentTime);
+            const duration = formatTime(state.audio.duration);
+            document.getElementById('timeDisplay').textContent = `${current} / ${duration}`;
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '00:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        document.getElementById('progressBar').addEventListener('click', (e) => {
+            if (!state.audio) return;
+            const rect = e.target.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            state.audio.currentTime = percent * state.audio.duration;
+        });
+
+        // Upload de imagens
+        document.getElementById('bgFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const img = new Image();
+            img.onload = () => { state.backgroundImage = img; };
+            img.src = URL.createObjectURL(file);
+        });
+
+        document.getElementById('coverFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const img = new Image();
+            img.onload = () => { state.coverImage = img; };
+            img.src = URL.createObjectURL(file);
+        });
+
+        document.getElementById('logoFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const img = new Image();
+            img.onload = () => { state.logoImage = img; };
+            img.src = URL.createObjectURL(file);
+        });
+
+        // Controlos de layout
+        document.querySelectorAll('input[name="layout"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                state.layout = e.target.value;
+            });
+        });
+
+        document.getElementById('bgOpacity').addEventListener('input', (e) => {
+            state.bgOpacity = e.target.value / 100;
+            document.getElementById('bgOpacityValue').textContent = e.target.value;
+        });
+
+        document.getElementById('overlayOpacity').addEventListener('input', (e) => {
+            state.overlayOpacity = e.target.value / 100;
+            document.getElementById('overlayValue').textContent = e.target.value;
+        });
+
+        document.getElementById('bgAudioReactive').addEventListener('change', (e) => {
+            state.bgAudioReactive = e.target.checked;
+        });
+
+        // Controlos da capa
+        document.querySelectorAll('input[name="coverMode"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                state.coverMode = e.target.value;
+            });
+        });
+
+        document.getElementById('coverZoom').addEventListener('input', (e) => {
+            state.coverZoom = e.target.value / 100;
+            document.getElementById('coverZoomValue').textContent = e.target.value;
+        });
+
+        document.getElementById('coverSize').addEventListener('input', (e) => {
+            state.coverSize = parseInt(e.target.value);
+            document.getElementById('coverSizeValue').textContent = e.target.value;
+        });
+
+        document.getElementById('coverLocked').addEventListener('change', (e) => {
+            state.coverLocked = e.target.checked;
+        });
+
+        // Controlos do visualizer
+        document.querySelectorAll('input[name="vizMode"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                state.vizMode = e.target.value;
+            });
+        });
+
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                document.querySelectorAll('.color-option').forEach(o => o.classList.remove('active'));
+                e.target.classList.add('active');
+                state.vizColor = e.target.dataset.color;
+            });
+        });
+
+        // Controlos do logo
+        document.getElementById('logoZoom').addEventListener('input', (e) => {
+            state.logoZoom = e.target.value / 100;
+            document.getElementById('logoZoomValue').textContent = e.target.value;
+        });
+
+        document.getElementById('logoSize').addEventListener('input', (e) => {
+            state.logoSize = parseInt(e.target.value);
+            document.getElementById('logoSizeValue').textContent = e.target.value;
+        });
+
+        document.getElementById('logoRotation').addEventListener('input', (e) => {
+            state.logoRotationSpeed = parseInt(e.target.value);
+            document.getElementById('logoRotationValue').textContent = e.target.value;
+        });
+
+        document.getElementById('logoLocked').addEventListener('change', (e) => {
+            state.logoLocked = e.target.checked;
+        });
+
+        // Controlos de tipografia
+        document.getElementById('songTitle').addEventListener('input', (e) => {
+            state.songTitle = e.target.value;
+        });
+
+        document.getElementById('artistName').addEventListener('input', (e) => {
+            state.artistName = e.target.value;
+        });
+
+        document.getElementById('fontFamily').addEventListener('change', (e) => {
+            state.fontFamily = e.target.value;
+        });
+
+        document.querySelectorAll('input[name="fontSize"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                state.fontSize = parseInt(e.target.value);
+                document.getElementById('customFontSize').value = state.fontSize;
+            });
+        });
+
+        document.getElementById('customFontSize').addEventListener('input', (e) => {
+            state.fontSize = parseInt(e.target.value);
+        });
+
+        document.getElementById('artistPercent').addEventListener('input', (e) => {
+            state.artistPercent = e.target.value / 100;
+            document.getElementById('artistPercentValue').textContent = e.target.value;
+        });
+
+        document.getElementById('textLocked').addEventListener('change', (e) => {
+            state.textLocked = e.target.checked;
+        });
+
+        // Drag & Drop com snap guides
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+            
+            // Verificar se clicou no texto
+            if (!state.textLocked && isPointInText(x, y)) {
+                state.dragging = 'text';
+                state.dragOffsetX = x - state.textX;
+                state.dragOffsetY = y - state.textY;
+                return;
+            }
+            
+            // Verificar se clicou no logo
+            if (!state.logoLocked && isPointInLogo(x, y)) {
+                state.dragging = 'logo';
+                state.dragOffsetX = x - state.logoX;
+                state.dragOffsetY = y - state.logoY;
+                return;
+            }
+            
+            // Verificar se clicou na capa
+            if (!state.coverLocked && isPointInCover(x, y)) {
+                state.dragging = 'cover';
+                state.dragOffsetX = x - state.coverX;
+                state.dragOffsetY = y - state.coverY;
+                return;
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!state.dragging) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+            
+            let newX = x - state.dragOffsetX;
+            let newY = y - state.dragOffsetY;
+            
+            // Snap guides
+            state.snapLines = [];
+            const snapThreshold = 10;
+            
+            // Snap ao centro horizontal
+            if (Math.abs(newX - 960) < snapThreshold) {
+                newX = 960;
+                state.snapLines.push({ type: 'vertical', pos: 960 });
+            }
+            
+            // Snap ao centro vertical
+            if (Math.abs(newY - 540) < snapThreshold) {
+                newY = 540;
+                state.snapLines.push({ type: 'horizontal', pos: 540 });
+            }
+            
+            // Snap entre elementos
+            if (state.dragging === 'cover') {
+                // Snap ao logo
+                if (Math.abs(newX - state.logoX) < snapThreshold) {
+                    newX = state.logoX;
+                    state.snapLines.push({ type: 'vertical', pos: state.logoX });
+                }
+                if (Math.abs(newY - state.logoY) < snapThreshold) {
+                    newY = state.logoY;
+                    state.snapLines.push({ type: 'horizontal', pos: state.logoY });
+                }
+                // Snap ao texto
+                if (Math.abs(newX - state.textX) < snapThreshold) {
+                    newX = state.textX;
+                    state.snapLines.push({ type: 'vertical', pos: state.textX });
+                }
+                if (Math.abs(newY - state.textY) < snapThreshold) {
+                    newY = state.textY;
+                    state.snapLines.push({ type: 'horizontal', pos: state.textY });
+                }
+            } else if (state.dragging === 'logo') {
+                // Snap à capa
+                if (Math.abs(newX - state.coverX) < snapThreshold) {
+                    newX = state.coverX;
+                    state.snapLines.push({ type: 'vertical', pos: state.coverX });
+                }
+                if (Math.abs(newY - state.coverY) < snapThreshold) {
+                    newY = state.coverY;
+                    state.snapLines.push({ type: 'horizontal', pos: state.coverY });
+                }
+                // Snap ao texto
+                if (Math.abs(newX - state.textX) < snapThreshold) {
+                    newX = state.textX;
+                    state.snapLines.push({ type: 'vertical', pos: state.textX });
+                }
+                if (Math.abs(newY - state.textY) < snapThreshold) {
+                    newY = state.textY;
+                    state.snapLines.push({ type: 'horizontal', pos: state.textY });
+                }
+            } else if (state.dragging === 'text') {
+                // Snap à capa
+                if (Math.abs(newX - state.coverX) < snapThreshold) {
+                    newX = state.coverX;
+                    state.snapLines.push({ type: 'vertical', pos: state.coverX });
+                }
+                if (Math.abs(newY - state.coverY) < snapThreshold) {
+                    newY = state.coverY;
+                    state.snapLines.push({ type: 'horizontal', pos: state.coverY });
+                }
+                // Snap ao logo
+                if (Math.abs(newX - state.logoX) < snapThreshold) {
+                    newX = state.logoX;
+                    state.snapLines.push({ type: 'vertical', pos: state.logoX });
+                }
+                if (Math.abs(newY - state.logoY) < snapThreshold) {
+                    newY = state.logoY;
+                    state.snapLines.push({ type: 'horizontal', pos: state.logoY });
+                }
+            }
+            
+            if (state.dragging === 'cover') {
+                state.coverX = newX;
+                state.coverY = newY;
+            } else if (state.dragging === 'logo') {
+                state.logoX = newX;
+                state.logoY = newY;
+            } else if (state.dragging === 'text') {
+                state.textX = newX;
+                state.textY = newY;
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            state.dragging = null;
+            state.snapLines = [];
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            state.dragging = null;
+            state.snapLines = [];
+        });
+
+        function isPointInCover(x, y) {
+            const halfSize = state.coverSize / 2;
+            return x >= state.coverX - halfSize && x <= state.coverX + halfSize &&
+                   y >= state.coverY - halfSize && y <= state.coverY + halfSize;
+        }
+
+        function isPointInLogo(x, y) {
+            const dx = x - state.logoX;
+            const dy = y - state.logoY;
+            return Math.sqrt(dx * dx + dy * dy) <= state.logoSize / 2;
+        }
+
+        function isPointInText(x, y) {
+            const textWidth = 400;
+            const textHeight = state.fontSize * 2.5;
+            return x >= state.textX - textWidth / 2 && x <= state.textX + textWidth / 2 &&
+                   y >= state.textY - textHeight / 2 && y <= state.textY + textHeight / 2;
+        }
+
+        // Loop de renderização
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Fundo
+            if (state.backgroundImage) {
+                ctx.globalAlpha = state.bgOpacity;
+                
+                if (state.layout === 'left') {
+                    ctx.drawImage(state.backgroundImage, 0, 0, 960, 1080);
+                } else {
+                    ctx.drawImage(state.backgroundImage, 960, 0, 960, 1080);
+                }
+                
+                ctx.globalAlpha = 1;
+            }
+            
+            // Overlay gradiente
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+            if (state.layout === 'left') {
+                gradient.addColorStop(0, `rgba(0, 0, 0, ${state.overlayOpacity})`);
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            } else {
+                gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+                gradient.addColorStop(1, `rgba(0, 0, 0, ${state.overlayOpacity})`);
+            }
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Audio reativo sobre fundo
+            if (state.bgAudioReactive && state.isPlaying) {
+                state.analyser.getByteFrequencyData(state.audioData);
+                const avgFrequency = state.audioData.reduce((a, b) => a + b, 0) / state.audioData.length;
+                const intensity = avgFrequency / 255;
+                
+                ctx.globalAlpha = intensity * 0.3;
+                ctx.fillStyle = state.vizColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.globalAlpha = 1;
+            }
+            
+            // Capa do álbum
+            if (state.coverImage) {
+                const size = state.coverSize;
+                const imgSize = size * state.coverZoom;
+                
+                ctx.save();
+                ctx.translate(state.coverX, state.coverY);
+                
+                // Moldura
+                ctx.fillStyle = '#000';
+                ctx.fillRect(-size / 2 - 10, -size / 2 - 10, size + 20, size + 20);
+                
+                // Clip para a imagem
+                ctx.beginPath();
+                ctx.rect(-size / 2, -size / 2, size, size);
+                ctx.clip();
+                
+                // Imagem com zoom e pan
+                const imgX = -imgSize / 2 + state.coverPanX;
+                const imgY = -imgSize / 2 + state.coverPanY;
+                ctx.drawImage(state.coverImage, imgX, imgY, imgSize, imgSize);
+                
+                ctx.restore();
+                
+                // Visualizer sobre a moldura
+                if (state.isPlaying) {
+                    state.analyser.getByteFrequencyData(state.audioData);
+                    drawVisualizer(state.coverX, state.coverY, size);
+                }
+            }
+            
+            // Logotipo
+            if (state.logoImage) {
+                ctx.save();
+                ctx.translate(state.logoX, state.logoY);
+                ctx.rotate(state.logoRotation * Math.PI / 180);
+                
+                // Círculo de fundo
+                ctx.beginPath();
+                ctx.arc(0, 0, state.logoSize / 2, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                ctx.fill();
+                ctx.strokeStyle = state.vizColor;
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                
+                // Clip circular
+                ctx.beginPath();
+                ctx.arc(0, 0, state.logoSize / 2 - 5, 0, Math.PI * 2);
+                ctx.clip();
+                
+                // Imagem com zoom
+                const logoImgSize = state.logoSize * state.logoZoom;
+                ctx.drawImage(state.logoImage, -logoImgSize / 2, -logoImgSize / 2, logoImgSize, logoImgSize);
+                
+                ctx.restore();
+                
+                // Atualizar rotação
+                if (state.logoRotationSpeed > 0) {
+                    state.logoRotation += state.logoRotationSpeed / 60;
+                    if (state.logoRotation >= 360) state.logoRotation -= 360;
+                }
+            }
+            
+            // Texto
+            if (state.songTitle || state.artistName) {
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // Título
+                if (state.songTitle) {
+                    ctx.font = `bold ${state.fontSize}px ${state.fontFamily}`;
+                    ctx.fillStyle = '#fff';
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+                    ctx.shadowBlur = 10;
+                    ctx.fillText(state.songTitle, state.textX, state.textY - state.fontSize * 0.6);
+                }
+                
+                // Artista
+                if (state.artistName) {
+                    const artistFontSize = state.fontSize * state.artistPercent;
+                    ctx.font = `${artistFontSize}px ${state.fontFamily}`;
+                    ctx.fillStyle = '#aaa';
+                    ctx.fillText(state.artistName, state.textX, state.textY + state.fontSize * 0.6);
+                }
+                
+                ctx.shadowBlur = 0;
+            }
+            
+            // Snap lines
+            if (state.snapLines.length > 0) {
+                ctx.strokeStyle = '#00d4ff';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                
+                state.snapLines.forEach(line => {
+                    ctx.beginPath();
+                    if (line.type === 'vertical') {
+                        ctx.moveTo(line.pos, 0);
+                        ctx.lineTo(line.pos, canvas.height);
+                    } else {
+                        ctx.moveTo(0, line.pos);
+                        ctx.lineTo(canvas.width, line.pos);
+                    }
+                    ctx.stroke();
+                });
+                
+                ctx.setLineDash([]);
+            }
+            
+            requestAnimationFrame(render);
+        }
+
+        function drawVisualizer(cx, cy, size) {
+            const barCount = 32;
+            const barWidth = 4;
+            const barSpacing = 2;
+            const halfSize = size / 2;
+            
+            ctx.fillStyle = state.vizColor;
+            ctx.shadowColor = state.vizColor;
+            ctx.shadowBlur = 10;
+            
+            if (state.vizMode === 'double' || state.vizMode === 'left') {
+                // Lado esquerdo
+                for (let i = 0; i < barCount; i++) {
+                    const barHeight = (state.audioData[i] / 255) * 80;
+                    const x = cx - halfSize - 20 - (barWidth + barSpacing) * (barCount - i);
+                    const y = cy - barHeight / 2;
+                    ctx.fillRect(x, y, barWidth, barHeight);
+                }
+            }
+            
+            if (state.vizMode === 'double' || state.vizMode === 'right') {
+                // Lado direito
+                for (let i = 0; i < barCount; i++) {
+                    const barHeight = (state.audioData[i] / 255) * 80;
+                    const x = cx + halfSize + 20 + (barWidth + barSpacing) * i;
+                    const y = cy - barHeight / 2;
+                    ctx.fillRect(x, y, barWidth, barHeight);
+                }
+            }
+            
+            if (state.vizMode === 'full') {
+                // Contorno completo
+                for (let i = 0; i < barCount; i++) {
+                    const barHeight = (state.audioData[i] / 255) * 60;
+                    
+                    // Topo
+                    const topX = cx - halfSize + (size / barCount) * i;
+                    ctx.fillRect(topX, cy - halfSize - 20 - barHeight, barWidth, barHeight);
+                    
+                    // Base
+                    ctx.fillRect(topX, cy + halfSize + 20, barWidth, barHeight);
+                    
+                    // Esquerda
+                    const leftY = cy - halfSize + (size / barCount) * i;
+                    ctx.fillRect(cx - halfSize - 20 - barHeight, leftY, barHeight, barWidth);
+                    
+                    // Direita
+                    ctx.fillRect(cx + halfSize + 20, leftY, barHeight, barWidth);
+                }
+            }
+            
+            ctx.shadowBlur = 0;
+        }
+
+        // Exportação
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            if (!state.audio) {
+                alert('Por favor, carregue um ficheiro de áudio primeiro.');
+                return;
+            }
+            
+            alert('Funcionalidade de exportação MP4 requer implementação adicional com MediaRecorder ou FFmpeg.wasm');
+        });
+
+        // Iniciar renderização
+        render();
+    </script>
+
+
+</body></html>
